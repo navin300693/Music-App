@@ -482,3 +482,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Azurite local folders
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json
+__blobstorage__/
+
+# Visual Studio Code files for those working on multiple tools
+src/.vscode/

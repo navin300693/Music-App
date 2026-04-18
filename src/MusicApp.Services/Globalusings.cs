@@ -1,0 +1,16 @@
+global using MusicApp.Services.Contracts;
+global using MusicApp.Services.Contracts.Interfaces;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Identity;
+global using MusicApp.Data.Entities;
+global using MusicApp.Services.Contracts.Models;
+global using MusicApp.Repositories.Contracts;
+global using MusicApp.Repositories.Contracts.Interfaces;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using MusicApp.Services.Factories;
+global using System.ComponentModel.DataAnnotations;
+global using MusicApp.Common.Attributes;
+global using Azure.Storage.Blobs;
+global using Azure.Storage.Sas;
+global using MusicApp.Services.Helpers;
