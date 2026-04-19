@@ -49,6 +49,16 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 // Add services to the container.
@@ -87,6 +97,7 @@ app.MapGet("/debug/dp", (IDataProtectionProvider dp) =>
     return new { token, result };
 });
 
+app.UseCors("WebApp");
 app.UseAuthentication();
 app.UseAuthorization();
 var identityGroup = app.MapGroup("api/v1/identity");
@@ -99,6 +110,25 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
+    var blobServiceClient = app.Services.GetRequiredService<BlobServiceClient>();
+    await blobServiceClient.SetPropertiesAsync(new BlobServiceProperties
+    {
+        Cors =
+        [
+            new BlobCorsRule
+            {
+                AllowedOrigins = "*",
+                AllowedMethods = "GET",
+                AllowedHeaders = "*",
+                ExposedHeaders = "*",
+                MaxAgeInSeconds = 3600
+            }
+        ],
+        Logging = new BlobAnalyticsLogging { Version = "1.0", Read = false, Write = false, Delete = false, RetentionPolicy = new BlobRetentionPolicy { Enabled = false } },
+        HourMetrics = new BlobMetrics { Version = "1.0", Enabled = false, RetentionPolicy = new BlobRetentionPolicy { Enabled = false } },
+        MinuteMetrics = new BlobMetrics { Version = "1.0", Enabled = false, RetentionPolicy = new BlobRetentionPolicy { Enabled = false } }
+    });
+
     Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
     app.MapOpenApi();
     // 1. Swagger UI

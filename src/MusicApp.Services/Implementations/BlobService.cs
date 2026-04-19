@@ -1,6 +1,6 @@
 namespace MusicApp.Services.Implementations;
 
-public class BlobService(BlobServiceClient blobClient, ILogger<BlobService> logger) : IBlobService
+public class BlobService(BlobServiceClient blobClient, IConfiguration config, ILogger<BlobService> logger) : IBlobService
 {
     /// <summary>
     /// Uploads the stream to three quality tiers (high, standard, low) under the given container.
@@ -57,12 +57,15 @@ public class BlobService(BlobServiceClient blobClient, ILogger<BlobService> logg
         };
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-        var sasToken = blob.GenerateSasUri(sasBuilder).Query;
+        var sasUri = blob.GenerateSasUri(sasBuilder);
 
-        // Swap the storage origin for the CDN host so clients hit the edge cache
-        var cdnUrl = $"https://cdn.musicapp.com/{containerName}/{fullPath}{sasToken}";
-        logger.LogInformation("Secure CDN link generated for {FullPath}", fullPath);
+        var cdnHost = config["CdnHost"];
+        var url = string.IsNullOrWhiteSpace(cdnHost)
+            ? sasUri.ToString()
+            : $"https://{cdnHost}/{containerName}/{fullPath}{sasUri.Query}";
 
-        return await Task.FromResult(cdnUrl);
+        logger.LogInformation("Secure link generated for {FullPath}", fullPath);
+
+        return await Task.FromResult(url);
     }
 }

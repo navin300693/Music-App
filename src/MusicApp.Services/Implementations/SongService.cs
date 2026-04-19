@@ -58,12 +58,19 @@ public class SongService(ISongRepository repository, IBlobService blobService, I
         var requestList = requests.ToList();
         logger.LogInformation("Bulk creating {Count} songs", requestList.Count);
 
-        var entities = requestList.Select(r =>
+        var entities = new List<SongEntity>();
+
+        foreach (var r in requestList)
         {
             using var stream = r.SongFile.OpenReadStream();
             var duration = r.Duration ?? AudioFileHelper.ExtractDuration(r.SongFile.FileName, stream);
-            return SongFactory.CreateEntity(r, duration);
-        }).ToList();
+            var entity = SongFactory.CreateEntity(r, duration);
+            var extension = Path.GetExtension(r.SongFile.FileName);
+            var blobName = $"{entity.Id}{extension}";
+            await blobService.UploadFileAsync("music-content", blobName, stream);
+            logger.LogInformation("Uploaded blob {BlobName} for song {SongId}", blobName, entity.Id);
+            entities.Add(entity);
+        }
 
         await repository.AddRangeAsync(entities);
 

@@ -14,3 +14,4 @@ global using MusicApp.Common.Attributes;
 global using Azure.Storage.Blobs;
 global using Azure.Storage.Sas;
 global using MusicApp.Services.Helpers;
+global using Microsoft.Extensions.Configuration;

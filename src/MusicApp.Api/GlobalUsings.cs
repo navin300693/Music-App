@@ -19,3 +19,5 @@ global using MusicApp.Services.Factories;
 global using Scalar.AspNetCore;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.DataProtection;
+global using Azure.Storage.Blobs;
+global using Azure.Storage.Blobs.Models;

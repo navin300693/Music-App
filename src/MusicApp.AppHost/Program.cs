@@ -1,7 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // All resources are added here in the AppHost, and then referenced by the API project. This is a key pattern in Aspire, where the AppHost is the main composition root for all your services and dependencies.
-var sql = builder.AddSqlServer("SqlServer")
+var sql = builder.AddSqlServer("SqlServer", port: 1433)
+                 .WithLifetime(ContainerLifetime.Persistent)
                  .AddDatabase("MusicDb");
 
 // var cosmos = builder.AddAzureCosmosDB("Cosmos")
@@ -16,7 +17,9 @@ var sql = builder.AddSqlServer("SqlServer")
 
 var storage = builder.AddAzureStorage("Storage").RunAsEmulator(container =>
                      {
-                            container.WithImageTag("latest"); ;
+                            container.WithImageTag("latest");
+                            container.WithLifetime(ContainerLifetime.Persistent);
+                            container.WithBlobPort(10000);
                      })
                      .AddBlobs("Blobs");
 
